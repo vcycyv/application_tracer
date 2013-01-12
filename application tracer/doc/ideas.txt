@@ -2,3 +2,5 @@ schedule
 add user defined template
 interface to report system
 prediction based on time series 
+
+Need an enbeded database

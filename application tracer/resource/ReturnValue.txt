@@ -1,0 +1,13 @@
+import static com.sun.btrace.BTraceUtils.*;
+import com.sun.btrace.annotations.*;
+ 
+@BTrace public class ${clazz}_${method}{
+   @OnMethod(
+      clazz="${clazz}",
+      method="${method}",
+      location=@Location(Kind.RETURN)
+   )
+   public static void traceExecute(@Self ${clazz} instance, @Return ${returnType} result){
+     println(strcat("__${clazz}-${method}-return__",str(result)));
+   }
+}

@@ -14,13 +14,13 @@ public class DirectCommandToFileTask implements Runnable {
 
 	public DirectCommandToFileTask(String command, String filePath) {
 		this.command = command;
-		this.file = new File(filePath + ".txt");
+		this.file = new File(filePath);
 	}
-
+	
 	@Override
 	public void run() {
 		try {
-			Process p = Runtime.getRuntime().exec(command);
+			Process p = Runtime.getRuntime().exec("cmd /c " + command);
 			StringBuffer output = new StringBuffer("");
 			if (p != null) {
 				BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -44,5 +44,9 @@ public class DirectCommandToFileTask implements Runnable {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public File getFile(){
+		return file;
 	}
 }

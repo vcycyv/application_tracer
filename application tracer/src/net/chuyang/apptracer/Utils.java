@@ -1,35 +1,44 @@
 package net.chuyang.apptracer;
 
 import java.util.Map;
+import java.util.ResourceBundle;
 
-import org.apache.commons.lang3.StringUtils;
+import net.chuyang.apptracer.codegen.ReturnValueVO;
 
 public class Utils {
 	/**
 	 * For example, the code template is: I love ${food}, haha. 
 	 * The paramMap may contain <food, apple>, then the result is I love apple, haha.
 	 * 
-	 * @param templateCode
+	 * @param command
 	 * @param paramMap key is place holder, the value is the String used to replace the place holder.
 	 * @return
 	 */
-	public static String processCodeTemplate(String templateCode, Map<String, String> paramMap){
+	public static String processCodeTemplate(String command, Map<String, String> paramMap){
 		for(Map.Entry<String, String> entry : paramMap.entrySet()){
-			String placeHolder = "${" + entry.getKey() + "}";
+			String placeHolder = "\\$\\{" + entry.getKey() + "\\}";
 			
 			//validation
-			int count = StringUtils.countMatches(templateCode, placeHolder);
-			if(count != 1 ){
-				throw new RuntimeException(entry.getKey() + " does not show up in code template or there are multiple occurence.");
-			}
+			/*int count = StringUtils.countMatches(command, placeHolder);
+			if(count == 0 ){
+				throw new RuntimeException(entry.getKey() + " does not show up in code template.");
+			}*/
 			
-			templateCode = templateCode.replace(placeHolder, entry.getValue());
+			command = command.replaceAll(placeHolder, entry.getValue());
 		}
-		return templateCode;
+		return command;
+	}
+	
+	public static String getlocalizedString(String key){
+		ResourceBundle rb = ResourceBundle.getBundle("net.chuyang.apptracer.i18n.RB");
+		return rb.getString(key);
 	}
 	
 	public static void main(String[] args){
-		String command = "cmd /c C:/tools/packages/btrace/bin/btrace -cp C:/tools/packages/btrace 6280  C:/tools/packages/btrace/TraceMethodArgsAndReturn.java";
-		TaskProcessor.INSTANCE.createTask(command, "xyz");
+		ReturnValueVO vo = new ReturnValueVO();
+		vo.setClazz("CaseObject");
+		vo.setMethod("execute");
+		vo.setReturnType("boolean");
+		TaskProcessor.INSTANCE.handleReturnValueTask(vo);
 	}
 }
