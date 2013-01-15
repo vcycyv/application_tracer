@@ -3,7 +3,7 @@ package net.chuyang.apptracer;
 public enum Configuration {
 	INSTANCE;
 	
-	private String targetPort = "6892";
+	private String targetPort = "5516";
 	
 	public String getAppFolderPath(){
 		String workFolder = System.getProperty("apptracer.work.folder");

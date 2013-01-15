@@ -35,10 +35,11 @@ public class DirectCommandToFileTask implements Runnable {
 							output.setLength(0);
 						}
 					}
-					is.close();
 				} catch (Exception e) {
-					e.printStackTrace();
-				}
+					throw new RuntimeException(e);
+				} finally{
+					is.close();
+				} 
 			}
 
 		} catch (Exception e) {

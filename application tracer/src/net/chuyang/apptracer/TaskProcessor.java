@@ -53,9 +53,11 @@ public enum TaskProcessor {
 	}
 	
 	private String getCommand(String scriptFileName){
+		//To process path for space so they can be used in Runtime.getRuntime().exec().
 		String braceCmdPath = BTRACE_COMMAND_PATH.replaceAll(" ", "\" \"");
 		String classPath = Configuration.INSTANCE.getClasspath().replaceAll(" ", "\" \"");
 		String targetPath = TARGET_CLASSPATH.replaceAll(" ", "\" \"");
+		
 		return new StringBuilder().append(braceCmdPath).append(" -cp ").append(classPath)
 				.append(" ").append(Configuration.INSTANCE.getTargetPort()).append(" ").append(targetPath).append(FILE_SEPARATOR).append(scriptFileName).toString();
 	}
@@ -89,7 +91,7 @@ public enum TaskProcessor {
 		String rtnVal = "";
 		try {
 			Map<String, String> map = BeanUtils.describe(vo);
-			map.remove("class");
+			map.remove("class"); // The map created by BeanUtils.describe() always has an unwanted class key-value pare.
 			rtnVal = Utils.processCodeTemplate(script, map);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

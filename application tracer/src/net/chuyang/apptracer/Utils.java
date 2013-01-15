@@ -1,5 +1,7 @@
 package net.chuyang.apptracer;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -17,16 +19,33 @@ public class Utils {
 	public static String processCodeTemplate(String command, Map<String, String> paramMap){
 		for(Map.Entry<String, String> entry : paramMap.entrySet()){
 			String placeHolder = "\\$\\{" + entry.getKey() + "\\}";
-			
-			//validation
-			/*int count = StringUtils.countMatches(command, placeHolder);
-			if(count == 0 ){
-				throw new RuntimeException(entry.getKey() + " does not show up in code template.");
-			}*/
-			
 			command = command.replaceAll(placeHolder, entry.getValue());
 		}
 		return command;
+	}
+	
+	public static String getOutputFromOSCommand(String command){
+		StringBuffer output = new StringBuffer("");
+		try{
+			Process p = Runtime.getRuntime().exec("cmd /c " + command);
+			if (p != null) {
+				BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				String buf = "";
+				try {
+					while ((buf = is.readLine()) != null) {
+						output.append(buf);
+						output.append(System.getProperty("line.separator"));
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally{
+					is.close();
+				}
+			}
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
+		return output.toString();
 	}
 	
 	public static String getlocalizedString(String key){

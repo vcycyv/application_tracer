@@ -1,5 +1,14 @@
 package net.chuyang.apptracer.codegen;
 
+
+/**
+ * 
+ * The VO is corresponding to RetrunValue.txt template. It has getter and setter 
+ * so it can be consumed by BeanUtils.describe().
+ * 
+ * @author chuyang
+ *
+ */
 public class ReturnValueVO {
 	private String clazz;
 	private String method;

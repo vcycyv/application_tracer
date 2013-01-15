@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml" fx:controller="net.chuyang.apptracer.ui.ApptracerController">
+  <children>
+    <VBox layoutX="72.0" layoutY="67.0" prefHeight="365.0" prefWidth="175.0">
+      <children>
+        <ListView fx:id="processList" prefHeight="242.0" prefWidth="164.0" />
+      </children>
+    </VBox>
+  </children>
+</AnchorPane>
