@@ -7,4 +7,5 @@ public class Constants {
 	public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	public static final String BTRACE_COMMAND_PATH = USER_DIR + FILE_SEPARATOR + "btrace" + FILE_SEPARATOR + "bin" + FILE_SEPARATOR + "btrace";
 	public static final String TARGET_CLASSPATH = USER_DIR + FILE_SEPARATOR + "target";
+	public static final String OUTPUT_PATH = USER_DIR + FILE_SEPARATOR + "output" + FILE_SEPARATOR;
 }

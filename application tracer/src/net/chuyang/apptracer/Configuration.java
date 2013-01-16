@@ -3,26 +3,18 @@ package net.chuyang.apptracer;
 public enum Configuration {
 	INSTANCE;
 	
-	private String targetPort = "5516";
-	
-	public String getAppFolderPath(){
-		String workFolder = System.getProperty("apptracer.work.folder");
-		if(workFolder == null)
-			return System.getProperty("java.io.tmpdir");
-		else
-			return workFolder;
-	}
+	private int targetPort = 0;
 	
 	public String getClasspath(){
 		//TODO - to implement getClassPath
 		return Constants.TARGET_CLASSPATH;
 	}
 	
-	public String getTargetPort() {
+	public int getTargetPort() {
 		return targetPort;
 	}
 
-	public void setTargetPort(String targetPort) {
+	public void setTargetPort(int targetPort) {
 		this.targetPort = targetPort;
 	}
 }

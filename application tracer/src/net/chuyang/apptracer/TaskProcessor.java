@@ -45,7 +45,7 @@ public enum TaskProcessor {
 
 	private DirectCommandToFileTask createTask(String command, String fileName){
 		StringBuilder sb = new StringBuilder();
-		String fullPathFileName = sb.append(Configuration.INSTANCE.getAppFolderPath()).append(fileName).toString();
+		String fullPathFileName = sb.append(Constants.OUTPUT_PATH).append(fileName).toString();
 		DirectCommandToFileTask task = new DirectCommandToFileTask(command, fullPathFileName);
 		taskMap.put(fileName, task);
 		exec.execute(task);

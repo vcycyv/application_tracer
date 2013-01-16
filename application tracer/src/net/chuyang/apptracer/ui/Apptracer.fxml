@@ -11,6 +11,12 @@
     <VBox layoutX="72.0" layoutY="67.0" prefHeight="365.0" prefWidth="175.0">
       <children>
         <ListView fx:id="processList" prefHeight="242.0" prefWidth="164.0" />
+        <AnchorPane id="AnchorPane" prefHeight="58.0" prefWidth="175.0">
+          <children>
+            <Button fx:id="startBtn" layoutX="31.0" layoutY="19.0" mnemonicParsing="false" onAction="#handleStartBtnAction" text="start" />
+            <Button fx:id="stopBtn" layoutX="107.0" layoutY="19.0" mnemonicParsing="false" text="stop" />
+          </children>
+        </AnchorPane>
       </children>
     </VBox>
   </children>
