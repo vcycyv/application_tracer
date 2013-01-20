@@ -49,7 +49,7 @@ public class Utils {
 	}
 	
 	public static String getlocalizedString(String key){
-		ResourceBundle rb = ResourceBundle.getBundle("net.chuyang.apptracer.i18n.RB");
+		ResourceBundle rb = ResourceBundle.getBundle("net/chuyang/apptracer/i18n/RB");
 		return rb.getString(key);
 	}
 	

@@ -2,22 +2,39 @@
 
 <?import java.lang.*?>
 <?import java.util.*?>
+<?import javafx.collections.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml" fx:controller="net.chuyang.apptracer.ui.ApptracerController">
   <children>
-    <VBox layoutX="72.0" layoutY="67.0" prefHeight="365.0" prefWidth="175.0">
+    <VBox layoutX="102.0" layoutY="68.0" prefHeight="224.0" prefWidth="175.0">
       <children>
-        <ListView fx:id="processList" prefHeight="242.0" prefWidth="164.0" />
-        <AnchorPane id="AnchorPane" prefHeight="58.0" prefWidth="175.0">
-          <children>
-            <Button fx:id="startBtn" layoutX="31.0" layoutY="19.0" mnemonicParsing="false" onAction="#handleStartBtnAction" text="start" />
-            <Button fx:id="stopBtn" layoutX="107.0" layoutY="19.0" mnemonicParsing="false" text="stop" />
-          </children>
-        </AnchorPane>
+        <ListView id="processList" fx:id="processListView" prefHeight="212.0" prefWidth="175.0" />
+        <AnchorPane id="AnchorPane" prefHeight="19.0" prefWidth="175.0" />
       </children>
     </VBox>
+    <ListView fx:id="classPathListView" layoutX="302.0" layoutY="68.0" prefHeight="174.0" prefWidth="415.0" />
+    <Button id="addClassFolderButton" fx:id="addClassFolderBtn" layoutX="374.0" layoutY="261.0" mnemonicParsing="false" onAction="#handleAddClassFolderAction" text="%fxml.add.classfolder.txt" />
+    <Button fx:id="addJarBtn" layoutX="529.0" layoutY="261.0" mnemonicParsing="false" onAction="#handleAddJarAction" text="%fxml.add.jar.txt" />
+    <Button fx:id="startBtn" layoutX="292.0" layoutY="536.0" mnemonicParsing="false" onAction="#handleStartBtnAction" text="%fxml.start.txt" />
+    <Button fx:id="stopBtn" layoutX="431.0" layoutY="536.0" mnemonicParsing="false" text="%fxml.stop.txt" />
+    <TextField fx:id="targetJarTextfield" editable="false" layoutX="190.0" layoutY="364.0" prefWidth="374.0" />
+    <Label layoutX="102.0" layoutY="367.0" prefWidth="80.0" text="%fxml.select.target.txt" />
+    <Button fx:id="addTargetJarBtn" layoutX="564.0" layoutY="365.0" mnemonicParsing="false" onAction="#handleSelectTargetJar" text="%fxml.select.txt" />
+    <ComboBox fx:id="classCombo" layoutX="190.0" layoutY="418.0" onAction="#handleSelectClassAction" prefWidth="422.9998779296875">
+      <items>
+        <FXCollections fx:factory="observableArrayList" />
+      </items>
+    </ComboBox>
+    <Label layoutX="102.0" layoutY="418.0" prefWidth="80.0" text="%fxml.select.class.txt" />
+    <Label layoutX="102.0" layoutY="470.0" text="%fxml.select.method.txt" />
+    <ComboBox fx:id="methodCombo" layoutX="190.0" layoutY="471.0" prefWidth="423.0">
+      <items>
+        <FXCollections fx:factory="observableArrayList">
+        </FXCollections>
+      </items>
+    </ComboBox>
   </children>
 </AnchorPane>
