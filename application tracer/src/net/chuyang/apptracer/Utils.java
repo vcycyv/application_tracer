@@ -5,8 +5,6 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import net.chuyang.apptracer.codegen.ReturnValueVO;
-
 public class Utils {
 	/**
 	 * For example, the code template is: I love ${food}, haha. 
@@ -51,13 +49,5 @@ public class Utils {
 	public static String getlocalizedString(String key){
 		ResourceBundle rb = ResourceBundle.getBundle("net/chuyang/apptracer/i18n/RB");
 		return rb.getString(key);
-	}
-	
-	public static void main(String[] args){
-		ReturnValueVO vo = new ReturnValueVO();
-		vo.setClazz("CaseObject");
-		vo.setMethod("execute");
-		vo.setReturnType("boolean");
-		TaskProcessor.INSTANCE.handleReturnValueTask(vo);
 	}
 }

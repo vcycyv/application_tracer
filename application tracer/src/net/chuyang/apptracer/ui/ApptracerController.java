@@ -72,7 +72,13 @@ public class ApptracerController implements Initializable {
 		vo.setClazz(classCombo.getSelectionModel().getSelectedItem().getClazz().getName());
 		vo.setMethod(methodCombo.getSelectionModel().getSelectedItem().getMethod().getName());
 		vo.setReturnType(methodCombo.getSelectionModel().getSelectedItem().getMethod().getReturnType().toString());
-		TaskProcessor.INSTANCE.handleReturnValueTask(vo);
+		
+		StringBuilder classPath = new StringBuilder();
+		for(String path : classPathListView.getItems()){
+			classPath = classPath.append(path).append(";");
+		}
+		
+		TaskProcessor.INSTANCE.handleReturnValueTask(vo, classPath.toString());
 	}
 	
 	@FXML

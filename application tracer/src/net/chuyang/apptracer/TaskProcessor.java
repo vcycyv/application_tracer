@@ -31,10 +31,10 @@ public enum TaskProcessor {
 	private Map<String, DirectCommandToFileTask> taskMap = new HashMap<String, DirectCommandToFileTask>();
 	
 	
-	public File handleReturnValueTask(ReturnValueVO vo){
+	public File handleReturnValueTask(ReturnValueVO vo, String classPath){
 		String outScriptFileName = new StringBuilder(vo.getClazz()).append("_").append(vo.getMethod()).append(".java").toString();
 		generateScriptFile(vo, outScriptFileName);
-		String command = getCommand(outScriptFileName);
+		String command = getCommand(outScriptFileName, classPath);
 		
 		String outLogFileName = new StringBuilder(vo.getClazz()).append("_").append(vo.getMethod()).append("_").append("returnvalue.txt").toString();
 		DirectCommandToFileTask task = createTask(command, outLogFileName);
@@ -52,10 +52,10 @@ public enum TaskProcessor {
 		return task;
 	}
 	
-	private String getCommand(String scriptFileName){
+	private String getCommand(String scriptFileName, String classPath){
 		//To process path for space so they can be used in Runtime.getRuntime().exec().
 		String braceCmdPath = BTRACE_COMMAND_PATH.replaceAll(" ", "\" \"");
-		String classPath = Configuration.INSTANCE.getClasspath().replaceAll(" ", "\" \"");
+		classPath = classPath.replaceAll(" ", "\" \"");
 		String targetPath = TARGET_CLASSPATH.replaceAll(" ", "\" \"");
 		
 		return new StringBuilder().append(braceCmdPath).append(" -cp ").append(classPath)

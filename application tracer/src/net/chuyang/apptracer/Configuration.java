@@ -4,12 +4,7 @@ public enum Configuration {
 	INSTANCE;
 	
 	private int targetPort = 0;
-	
-	public String getClasspath(){
-		//TODO - to implement getClassPath
-		return Constants.TARGET_CLASSPATH;
-	}
-	
+
 	public int getTargetPort() {
 		return targetPort;
 	}
