@@ -9,7 +9,7 @@ package net.chuyang.apptracer.codegen;
  * @author chuyang
  *
  */
-public class ReturnValueVO {
+public class ClassVO {
 	private String clazz;
 	private String method;
 	private String returnType;

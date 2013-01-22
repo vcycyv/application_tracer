@@ -1,13 +1,24 @@
 import static com.sun.btrace.BTraceUtils.*;
 import com.sun.btrace.annotations.*;
  
-@BTrace public class ${clazz}_${method}{
-   @OnMethod(
-      clazz="${clazz}",
-      method="${method}",
-      location=@Location(Kind.RETURN)
-   )
-   public static void traceExecute(@Self ${clazz} instance, @Return ${returnType} result){
-     println(strcat("__${clazz}-${method}-return__",str(result)));
-   }
+@BTrace public class Script{
+	@TLS static long beginTime;
+ 
+	@OnMethod(
+		clazz="${clazz}",
+		method="${method}"
+	)
+	public static void traceExecuteBegin(){
+		beginTime=timeMillis();
+	}
+	
+	@OnMethod(
+		clazz="${clazz}",
+		method="${method}",
+		location=@Location(Kind.RETURN)
+	)
+	public static void traceExecute(@Self ${clazz} instance, @Return ${returnType} result){
+		println(strcat("__return_value__ ",str(result)));
+		println(strcat("__time_takennn__ ",str(timeMillis()-beginTime)));
+	}
 }

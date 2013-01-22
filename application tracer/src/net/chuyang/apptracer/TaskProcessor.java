@@ -6,16 +6,14 @@ import static net.chuyang.apptracer.Constants.TARGET_CLASSPATH;
 import static net.chuyang.apptracer.Constants.TEMPLATE_RETURN_VALUE_FILE;
 import static net.chuyang.apptracer.Constants.USER_DIR;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import net.chuyang.apptracer.codegen.ReturnValueVO;
+import net.chuyang.apptracer.codegen.ClassVO;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
@@ -26,45 +24,54 @@ public enum TaskProcessor {
 	INSTANCE;
 	
 	private Logger logger = Logger.getLogger(getClass());
+	private static final String SCRIPT_FILE_NAME = "Script.java";
 	
-	private ExecutorService exec = Executors.newCachedThreadPool();
-	private Map<String, DirectCommandToFileTask> taskMap = new HashMap<String, DirectCommandToFileTask>();
-	
-	
-	public File handleReturnValueTask(ReturnValueVO vo, String classPath){
-		String outScriptFileName = new StringBuilder(vo.getClazz()).append("_").append(vo.getMethod()).append(".java").toString();
-		generateScriptFile(vo, outScriptFileName);
-		String command = getCommand(outScriptFileName, classPath);
-		
-		String outLogFileName = new StringBuilder(vo.getClazz()).append("_").append(vo.getMethod()).append("_").append("returnvalue.txt").toString();
-		DirectCommandToFileTask task = createTask(command, outLogFileName);
-		String id = UUID.randomUUID().toString();
-		taskMap.put(id, task);
-		return task.getFile();
-	}
+	public File handleTask(ClassVO vo, String classPath){
+		String command = getCommand(vo, classPath);
+		File rtnVal = new File(Constants.OUTPUT_PATH);
+		try {
+			Process p = Runtime.getRuntime().exec("cmd /c " + command);
+			StringBuffer output = new StringBuffer("");
+			if (p != null) {
+				BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				String buf = "";
+				try {
+					int count = 0;
+					while ((buf = is.readLine()) != null) {
+						output.append(buf);
+						output.append(System.getProperty("line.separator"));
+						if(++count % 5 == 0){
+							FileUtils.writeStringToFile(rtnVal, output.toString(), true);
+							output.setLength(0);
+						}
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				} finally{
+					is.close();
+				} 
+			}
 
-	private DirectCommandToFileTask createTask(String command, String fileName){
-		StringBuilder sb = new StringBuilder();
-		String fullPathFileName = sb.append(Constants.OUTPUT_PATH).append(fileName).toString();
-		DirectCommandToFileTask task = new DirectCommandToFileTask(command, fullPathFileName);
-		taskMap.put(fileName, task);
-		exec.execute(task);
-		return task;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return rtnVal;
 	}
 	
-	private String getCommand(String scriptFileName, String classPath){
+	private String getCommand(ClassVO vo, String classPath){
+		generateScriptFile(vo);
 		//To process path for space so they can be used in Runtime.getRuntime().exec().
 		String braceCmdPath = BTRACE_COMMAND_PATH.replaceAll(" ", "\" \"");
 		classPath = classPath.replaceAll(" ", "\" \"");
 		String targetPath = TARGET_CLASSPATH.replaceAll(" ", "\" \"");
 		
 		return new StringBuilder().append(braceCmdPath).append(" -cp ").append(classPath)
-				.append(" ").append(Configuration.INSTANCE.getTargetPort()).append(" ").append(targetPath).append(FILE_SEPARATOR).append(scriptFileName).toString();
+				.append(" ").append(Configuration.INSTANCE.getTargetPort()).append(" ").append(targetPath).append(FILE_SEPARATOR).append(SCRIPT_FILE_NAME).toString();
 	}
 	
-	private void generateScriptFile(ReturnValueVO vo, String outFileName) {
+	private void generateScriptFile(ClassVO vo) {
 		String script = getReturnValueScript(vo);
-		String outScriptFileName = new StringBuilder(TARGET_CLASSPATH).append(FILE_SEPARATOR).append(outFileName).toString();
+		String outScriptFileName = new StringBuilder(TARGET_CLASSPATH).append(FILE_SEPARATOR).append(SCRIPT_FILE_NAME).toString();
 		try {
 			FileUtils.writeStringToFile(new File(outScriptFileName), script);
 		} catch (IOException e) {
@@ -75,7 +82,7 @@ public enum TaskProcessor {
 		}
 	}
 	
-	private String getReturnValueScript(ReturnValueVO vo) {
+	private String getReturnValueScript(ClassVO vo) {
 		String script = "";
 		String pathName = USER_DIR + FILE_SEPARATOR + "resource" + FILE_SEPARATOR + TEMPLATE_RETURN_VALUE_FILE;
 		

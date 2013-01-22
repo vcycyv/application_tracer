@@ -25,7 +25,7 @@ import net.chuyang.apptracer.AssistenceService.ProcessVO;
 import net.chuyang.apptracer.Configuration;
 import net.chuyang.apptracer.TaskProcessor;
 import net.chuyang.apptracer.Utils;
-import net.chuyang.apptracer.codegen.ReturnValueVO;
+import net.chuyang.apptracer.codegen.ClassVO;
 
 public class ApptracerController implements Initializable {
 
@@ -68,7 +68,7 @@ public class ApptracerController implements Initializable {
 	private void handleStartBtnAction(ActionEvent event){
 		ProcessVO process = processListView.getSelectionModel().getSelectedItem();
 		Configuration.INSTANCE.setTargetPort(process.pid);
-		ReturnValueVO vo = new ReturnValueVO();
+		ClassVO vo = new ClassVO();
 		vo.setClazz(classCombo.getSelectionModel().getSelectedItem().getClazz().getName());
 		vo.setMethod(methodCombo.getSelectionModel().getSelectedItem().getMethod().getName());
 		vo.setReturnType(methodCombo.getSelectionModel().getSelectedItem().getMethod().getReturnType().toString());
@@ -78,7 +78,7 @@ public class ApptracerController implements Initializable {
 			classPath = classPath.append(path).append(";");
 		}
 		
-		TaskProcessor.INSTANCE.handleReturnValueTask(vo, classPath.toString());
+		TaskProcessor.INSTANCE.handleTask(vo, classPath.toString());
 	}
 	
 	@FXML
