@@ -2,6 +2,8 @@ package net.chuyang.apptracer.ui;
 
 import java.util.ResourceBundle;
 
+import net.chuyang.apptracer.Utils;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,6 +18,7 @@ public class Apptracer extends Application {
 		Parent root = FXMLLoader.load(getClass().getResource("Apptracer.fxml"), i18nBundle);
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
+		primaryStage.setTitle(Utils.getlocalizedString("Apptracer.title.txt"));
 		primaryStage.show();
 	}
 

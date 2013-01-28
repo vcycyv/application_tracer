@@ -3,13 +3,16 @@ package net.chuyang.apptracer.ui;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -22,19 +25,18 @@ import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import net.chuyang.apptracer.AssistenceService;
 import net.chuyang.apptracer.AssistenceService.ProcessVO;
-import net.chuyang.apptracer.Configuration;
-import net.chuyang.apptracer.TaskProcessor;
+import net.chuyang.apptracer.TaskProcessService;
 import net.chuyang.apptracer.Utils;
 import net.chuyang.apptracer.codegen.ClassVO;
+
+import org.thehecklers.dialogfx.DialogFX;
 
 public class ApptracerController implements Initializable {
 
 	@FXML
+	private Button refreshBtn;
+	@FXML
 	private ListView<ProcessVO> processListView;
-	@FXML
-	private Button startBtn;
-	@FXML
-	private Button stopBtn;
 	@FXML
 	private Button addClassFolderBtn;
 	@FXML
@@ -49,13 +51,18 @@ public class ApptracerController implements Initializable {
 	private ComboBox<ClassWrapper> classCombo;
 	@FXML
 	private ComboBox<MethodWrapper> methodCombo;
+	@FXML
+	private Button startBtn;
+	@FXML
+	private Button stopBtn;
 	
-	AssistenceService service = new AssistenceService();
+	AssistenceService assistService = new AssistenceService();
+	TaskProcessService taskProcessService = null;
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		ObservableList<ProcessVO> items = FXCollections.observableArrayList(service.getJavaProcess());
-		processListView.setItems(items);
+		stopBtn.setDisable(true);
+		handleRefreshJpsAction(null);
 		processListView.setCellFactory(new Callback<ListView<ProcessVO>, ListCell<ProcessVO>>() {
 			@Override
 			public ListCell<ProcessVO> call(ListView<ProcessVO> list) {
@@ -67,7 +74,6 @@ public class ApptracerController implements Initializable {
 	@FXML
 	private void handleStartBtnAction(ActionEvent event){
 		ProcessVO process = processListView.getSelectionModel().getSelectedItem();
-		Configuration.INSTANCE.setTargetPort(process.pid);
 		ClassVO vo = new ClassVO();
 		vo.setClazz(classCombo.getSelectionModel().getSelectedItem().getClazz().getName());
 		vo.setMethod(methodCombo.getSelectionModel().getSelectedItem().getMethod().getName());
@@ -78,7 +84,37 @@ public class ApptracerController implements Initializable {
 			classPath = classPath.append(path).append(";");
 		}
 		
-		TaskProcessor.INSTANCE.handleTask(vo, classPath.toString());
+		taskProcessService = new TaskProcessService();
+		taskProcessService.setClassVO(vo);
+		taskProcessService.setClassPath(classPath.toString());
+		taskProcessService.setPort(process.pid);
+		taskProcessService.start();
+		
+		taskProcessService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+            	startBtn.setDisable(false);
+                stopBtn.setDisable(true);
+                enableUI();
+                startBtn.requestFocus();
+            }
+        });
+		
+		taskProcessService.setOnRunning(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+            	startBtn.setDisable(true);
+                stopBtn.setDisable(false);
+                disableUI();
+            }
+        });
+	}
+	
+	@FXML
+	private void handleStopBtnAction(ActionEvent event) {
+		if(taskProcessService != null){
+			taskProcessService.cancel();
+		}
 	}
 	
 	@FXML
@@ -111,7 +147,7 @@ public class ApptracerController implements Initializable {
 		File selectedFile = chooser.showOpenDialog(addTargetJarBtn.getScene().getWindow());
 		targetJarTextfield.setText(selectedFile.getAbsolutePath());
 		
-		List<Class> classes = service.getClassesFromJar(selectedFile.getAbsolutePath());
+		List<Class> classes = assistService.getClassesFromJar(selectedFile.getAbsolutePath());
 		List<ClassWrapper> classWrappers = new ArrayList<ClassWrapper>();
 		for(Class clazz : classes){
 			ClassWrapper wrapper = new ClassWrapper(clazz);
@@ -130,6 +166,12 @@ public class ApptracerController implements Initializable {
 			methodWrappers.add(wrapper);
 		}
 		methodCombo.setItems(FXCollections.observableArrayList(methodWrappers));
+	}
+	
+	@FXML
+	private void handleRefreshJpsAction(ActionEvent event) {
+		ObservableList<ProcessVO> items = FXCollections.observableArrayList(assistService.getJavaProcess());
+		processListView.setItems(items);
 	}
 	
 	static class ProcessVOCell extends ListCell<ProcessVO>{
@@ -172,5 +214,29 @@ public class ApptracerController implements Initializable {
 		public String toString(){
 			return method.getName();
 		}
+	}
+
+	private void disableUI(){
+		addClassFolderBtn.setDisable(true);
+		addJarBtn.setDisable(true);
+		processListView.setDisable(true);
+		addTargetJarBtn.setDisable(true);
+		classCombo.setDisable(true);
+		methodCombo.setDisable(true);
+		targetJarTextfield.setDisable(true);
+		classPathListView.setDisable(true);
+		refreshBtn.setDisable(true);
+	}
+	
+	private void enableUI(){
+		addClassFolderBtn.setDisable(false);
+		addJarBtn.setDisable(false);
+		processListView.setDisable(false);
+		addTargetJarBtn.setDisable(false);
+		classCombo.setDisable(false);
+		methodCombo.setDisable(false);
+		targetJarTextfield.setDisable(false);
+		classPathListView.setDisable(false);
+		refreshBtn.setDisable(false);
 	}
 }

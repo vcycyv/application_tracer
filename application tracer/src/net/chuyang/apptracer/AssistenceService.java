@@ -1,5 +1,6 @@
 package net.chuyang.apptracer;
 
+import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 public class AssistenceService {
@@ -61,6 +64,19 @@ public class AssistenceService {
 			}catch(Exception e1){
 				logger.error("Failed to close jarFile: " + jarFile.getName(), e1);
 			}
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public int getLatestInvocationCount(){
+		String content;
+		try{
+			File file = new File(Constants.OUTPUT_PATH);
+			content = FileUtils.readFileToString(file);
+			int index = content.lastIndexOf(Constants.APPTRACER_STARTED);
+			String latestContent = content.substring(index);
+			return StringUtils.countMatches(latestContent, Constants.LINE_SEPARATOR) - 1;
+		}catch(Exception e){
 			throw new RuntimeException(e);
 		}
 	}

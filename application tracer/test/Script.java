@@ -12,12 +12,12 @@ import com.sun.btrace.annotations.*;
 		beginTime=timeMillis();
 	}
 	
-	@OnMethod(
+	/*@OnMethod(
 		clazz="${clazz}",
 		method="${method}",
 		location=@Location(Kind.RETURN)
 	)
 	public static void traceExecute(@Self ${clazz} instance, @Return ${returnType} result){
 		println(strcat(strcat(strcat(strcat(str(timeMillis()), "  ____  "), str(result)), "  ____  "), str(timeMillis()-beginTime)));
-	}
+	}*/
 }
