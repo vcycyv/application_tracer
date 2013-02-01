@@ -9,4 +9,5 @@ public class Constants {
 	public static final String TARGET_CLASSPATH = USER_DIR + FILE_SEPARATOR + "target";
 	public static final String OUTPUT_PATH = USER_DIR + FILE_SEPARATOR + "output" + FILE_SEPARATOR + "execution_info.txt";
 	public static final String APPTRACER_STARTED = "==Application Tracer Started==";
+	public static final String APPTRACER_STOPPED = "==Application Tracer Stopped==";
 }

@@ -1,6 +1,7 @@
 package net.chuyang.apptracer;
 
 import static net.chuyang.apptracer.Constants.APPTRACER_STARTED;
+import static net.chuyang.apptracer.Constants.APPTRACER_STOPPED;
 import static net.chuyang.apptracer.Constants.BTRACE_COMMAND_PATH;
 import static net.chuyang.apptracer.Constants.FILE_SEPARATOR;
 import static net.chuyang.apptracer.Constants.LINE_SEPARATOR;
@@ -13,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 import javafx.application.Platform;
@@ -58,9 +61,10 @@ public class TaskProcessService extends Service<File>{
 		return new Task<File>() {
             protected File call() {
             	String command = getCommand();
-        		File rtnVal = new File(Constants.OUTPUT_PATH);
+        		final File rtnVal = new File(Constants.OUTPUT_PATH);
         		try {
-        			FileUtils.writeStringToFile(rtnVal, LINE_SEPARATOR + APPTRACER_STARTED + LINE_SEPARATOR, true);
+        			final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        			FileUtils.writeStringToFile(rtnVal, LINE_SEPARATOR + APPTRACER_STARTED + df.format(new Date()) + LINE_SEPARATOR, true);
         			Process p = Runtime.getRuntime().exec("cmd /c " + command);
         			StringBuffer output = new StringBuffer("");
         			if (p != null) {
@@ -74,6 +78,12 @@ public class TaskProcessService extends Service<File>{
         			    	        Platform.runLater(new Runnable() {
         			    	            @Override
         			    	            public void run() {
+        			    	            	try {
+												FileUtils.writeStringToFile(rtnVal, APPTRACER_STOPPED + df.format(new Date()) + LINE_SEPARATOR, true);
+											} catch (IOException e) {
+												logger.error("Filed to insert stop flag.", e);
+											}
+        			    	            	
         			    	            	AssistenceService assistService = new AssistenceService();
         			    	            	int counts = assistService.getLatestInvocationCount();
                 							String msg = Utils.getlocalizedString("ApptracerController.invocation.count.msg.fmt");

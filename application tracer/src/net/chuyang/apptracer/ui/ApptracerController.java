@@ -3,7 +3,6 @@ package net.chuyang.apptracer.ui;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -28,8 +27,6 @@ import net.chuyang.apptracer.AssistenceService.ProcessVO;
 import net.chuyang.apptracer.TaskProcessService;
 import net.chuyang.apptracer.Utils;
 import net.chuyang.apptracer.codegen.ClassVO;
-
-import org.thehecklers.dialogfx.DialogFX;
 
 public class ApptracerController implements Initializable {
 
@@ -147,7 +144,11 @@ public class ApptracerController implements Initializable {
 		File selectedFile = chooser.showOpenDialog(addTargetJarBtn.getScene().getWindow());
 		targetJarTextfield.setText(selectedFile.getAbsolutePath());
 		
-		List<Class> classes = assistService.getClassesFromJar(selectedFile.getAbsolutePath());
+		List<String> paths = new ArrayList<String>();
+		for(String path : classPathListView.getItems()){
+			paths.add(path);
+		}
+		List<Class> classes = assistService.getClassesFromJar(selectedFile.getAbsolutePath(), paths);
 		List<ClassWrapper> classWrappers = new ArrayList<ClassWrapper>();
 		for(Class clazz : classes){
 			ClassWrapper wrapper = new ClassWrapper(clazz);

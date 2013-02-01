@@ -36,14 +36,20 @@ public class AssistenceService {
 		return rtnVal;
 	}
 	
-	public List<Class> getClassesFromJar(String jarFilePath){
+	public List<Class> getClassesFromJar(String jarFilePath, List<String> paths){
 		List<Class> rtnVal = new ArrayList<Class>();
 		JarFile jarFile = null;
 		try{
 			jarFile = new JarFile(jarFilePath);
 	        Enumeration e = jarFile.entries();
 	
-	        URL[] urls = { new URL("jar:file:" + jarFilePath +"!/") };
+	        List<URL> urlList = new ArrayList<URL>();
+	        for(String path : paths){
+	        	URL url = new File(path).toURI().toURL();
+	        	urlList.add(url);
+	        }
+	        urlList.add(new URL("jar:file:" + jarFilePath +"!/"));
+	        URL[] urls = urlList.toArray(new URL[urlList.size()]);
 	        URLClassLoader cl = URLClassLoader.newInstance(urls);
 	
 	        while (e.hasMoreElements()) {
@@ -88,6 +94,6 @@ public class AssistenceService {
 	
 	public static void main(String[] args){
 		//new AssistenceService().getJavaProcess();
-		new AssistenceService().getClassesFromJar("C:/ws/_git/application_tracer/application tracer/target/test.jar");
+		//new AssistenceService().getClassesFromJar("C:/ws/_git/application_tracer/application tracer/target/test.jar");
 	}
 }
