@@ -120,7 +120,8 @@ public class ApptracerController implements Initializable {
 		String title = Utils.getlocalizedString("ApptracerController.select.folder.title.txt");
 		chooser.setTitle(title);
 		File selectedDirectory = chooser.showDialog(addClassFolderBtn.getScene().getWindow());
-		classPathListView.getItems().add(selectedDirectory.getAbsolutePath());
+		if(selectedDirectory != null)
+			classPathListView.getItems().add(selectedDirectory.getAbsolutePath());
 	}
 	
 	@FXML
@@ -131,7 +132,8 @@ public class ApptracerController implements Initializable {
 		String title = Utils.getlocalizedString("ApptracerController.select.jar.titile.txt");
 		chooser.setTitle(title);
 		File selectedFile = chooser.showOpenDialog(addJarBtn.getScene().getWindow());
-		classPathListView.getItems().add(selectedFile.getAbsolutePath());
+		if(selectedFile != null)
+			classPathListView.getItems().add(selectedFile.getAbsolutePath());
 	}
 	
 	@FXML
