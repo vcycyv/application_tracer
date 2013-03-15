@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,10 +30,15 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.thehecklers.dialogfx.DialogFX;
 
+import com.sun.btrace.agent.Main;
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+
 public class TaskProcessService extends Service<File>{
 	private ClassVO classVO;
 	private String classPath;
 	private int port;
+	private Process p;
 	
 	private Logger logger = Logger.getLogger(getClass());
 	private static final String SCRIPT_FILE_NAME = "Script.java";
@@ -60,12 +66,12 @@ public class TaskProcessService extends Service<File>{
 	protected Task<File> createTask() {
 		return new Task<File>() {
             protected File call() {
-            	String command = getCommand();
+            	String[] command = getCommand();
         		final File rtnVal = new File(Constants.OUTPUT_PATH);
         		try {
         			final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         			FileUtils.writeStringToFile(rtnVal, LINE_SEPARATOR + APPTRACER_STARTED + df.format(new Date()) + LINE_SEPARATOR, true);
-        			Process p = Runtime.getRuntime().exec("cmd /c " + command);
+        			p = Runtime.getRuntime().exec(command);
         			StringBuffer output = new StringBuffer("");
         			if (p != null) {
         				BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -120,15 +126,24 @@ public class TaskProcessService extends Service<File>{
         };
 	}
 	
-	private String getCommand(){
+	public void destroyTask(){
+		try {
+			if(p != null){
+				if (com.sun.jna.Platform.isWindows())
+					Runtime.getRuntime().exec("taskkill /pid " + getPid(p) + " /f");
+				else if(com.sun.jna.Platform.isLinux())
+					Runtime.getRuntime().exec("kill -9 " + getPid(p));
+			}
+		} catch (IOException e) {
+			logger.log(Level.WARN, "Failed to kill process "+ getPid(p));
+		}
+		p.destroy();
+		cancel();
+	}
+	
+	private String[] getCommand(){
 		generateScriptFile(classVO);
-		//To process path for space so they can be used in Runtime.getRuntime().exec().
-		String braceCmdPath = BTRACE_COMMAND_PATH.replaceAll(" ", "\" \"");
-		String classPathProcessed = classPath.replaceAll(" ", "\" \"");
-		String targetPath = TARGET_CLASSPATH.replaceAll(" ", "\" \"");
-		
-		return new StringBuilder().append(braceCmdPath).append(" -cp ").append(classPathProcessed)
-				.append(" ").append(port).append(" ").append(targetPath).append(FILE_SEPARATOR).append(SCRIPT_FILE_NAME).toString();
+		return new String[]{BTRACE_COMMAND_PATH, "-cp", classPath, String.valueOf(port), TARGET_CLASSPATH + FILE_SEPARATOR + SCRIPT_FILE_NAME };
 	}
 	
 	private void generateScriptFile(ClassVO vo) {
@@ -168,4 +183,33 @@ public class TaskProcessService extends Service<File>{
 		return rtnVal;
 	}	
 	
+	private interface Kernel32 extends Library {
+	    public static Kernel32 INSTANCE = (Kernel32) Native.loadLibrary("kernel32", Kernel32.class);
+	    public int GetProcessId(Long hProcess);
+	}
+	
+	private int getPid(Process p) {
+	    Field f;
+
+	    if (com.sun.jna.Platform.isWindows()) {
+	        try {
+	            f = p.getClass().getDeclaredField("handle");
+	            f.setAccessible(true);
+	            int pid = Kernel32.INSTANCE.GetProcessId((Long) f.get(p));
+	            return pid;
+	        } catch (Exception ex) {
+	            Logger.getLogger(Main.class.getName()).log(Level.ERROR, null, ex);
+	        }
+	    } else if (com.sun.jna.Platform.isLinux()) {
+	        try {
+	            f = p.getClass().getDeclaredField("pid");
+	            f.setAccessible(true);
+	            int pid = (Integer) f.get(p);
+	            return pid;
+	        } catch (Exception ex) {
+	            Logger.getLogger(Main.class.getName()).log(Level.ERROR, null, ex);
+	        }
+	    }
+	    return 0;
+	}
 }

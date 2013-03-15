@@ -21,7 +21,7 @@ public class AssistenceService {
 		String[] processStrings = commandOutput.split(Constants.LINE_SEPARATOR);
 		
 		List<ProcessVO> rtnVal = new ArrayList<ProcessVO>();
-		for(String processString: processStrings){
+		for(String processString : processStrings){
 			String[] a = processString.split(" ");
 			ProcessVO vo = new ProcessVO();
 			if(a.length > 1){
@@ -32,6 +32,29 @@ public class AssistenceService {
 				vo.processName = "";
 			}
 			rtnVal.add(vo);	
+		}
+		return rtnVal;
+	}
+	
+	
+	public List<Integer> getPidsToKill(){
+		List<Integer> rtnVal = new ArrayList<Integer>();
+		String commandOutput = Utils.getOutputFromOSCommand("netstat -a -n -o");
+		String[] netstatStrings = commandOutput.split(Constants.LINE_SEPARATOR);
+		
+		boolean arriveAtData = false;
+		for(String netstatString : netstatStrings){
+			if(!arriveAtData){
+				if(netstatString.trim().startsWith("Proto"))
+					arriveAtData = true;
+				continue;
+			}else{
+				String[] fields = netstatString.trim().split("\\s{1,}");
+				if(fields.length > 4){
+					if(fields[2].endsWith(":2020"))
+						rtnVal.add(Integer.valueOf(fields[4]));
+				}
+			}
 		}
 		return rtnVal;
 	}
@@ -95,5 +118,6 @@ public class AssistenceService {
 	public static void main(String[] args){
 		//new AssistenceService().getJavaProcess();
 		//new AssistenceService().getClassesFromJar("C:/ws/_git/application_tracer/application tracer/target/test.jar");
+		new AssistenceService().getPidsToKill();
 	}
 }

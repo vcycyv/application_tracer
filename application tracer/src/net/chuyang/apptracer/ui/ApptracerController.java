@@ -110,7 +110,7 @@ public class ApptracerController implements Initializable {
 	@FXML
 	private void handleStopBtnAction(ActionEvent event) {
 		if(taskProcessService != null){
-			taskProcessService.cancel();
+			taskProcessService.destroyTask();
 		}
 	}
 	
