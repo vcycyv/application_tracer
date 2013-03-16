@@ -163,4 +163,6 @@ pip-log.txt
 .DS_Store
 /target
 /build.fxbuild
-/application tracer
+
+/btrace
+/output
