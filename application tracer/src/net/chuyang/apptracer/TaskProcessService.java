@@ -65,16 +65,18 @@ public class TaskProcessService extends Service<File>{
             	String[] command = getCommand();
         		final File rtnVal = new File(Constants.OUTPUT_PATH);
         		try {
-        			final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        			FileUtils.writeStringToFile(rtnVal, LINE_SEPARATOR + APPTRACER_STARTED + df.format(new Date()) + LINE_SEPARATOR, true);
         			p = Runtime.getRuntime().exec(command);
         			StringBuffer output = new StringBuffer("");
         			if (p != null) {
         				BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
         				String buf = "";
+        				boolean correctPidInCmd = false;
         				try {
+        					boolean startingFlagMarkedAlready = false;
+        					final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         					int count = 0;
         					while ((buf = is.readLine()) != null) {
+        						correctPidInCmd = true;
         						if(isCancelled()){
         							FileUtils.writeStringToFile(rtnVal, output.toString(), true);
         			    	        Platform.runLater(new Runnable() {
@@ -120,6 +122,11 @@ public class TaskProcessService extends Service<File>{
         			    			
         							break;
         						}else{
+        							if(!startingFlagMarkedAlready){
+	        		        			FileUtils.writeStringToFile(rtnVal, LINE_SEPARATOR + APPTRACER_STARTED + df.format(new Date()) + LINE_SEPARATOR, true);
+	        		        			startingFlagMarkedAlready = true;
+        							}
+        		        			
 	        						output.append(buf);
 	        						output.append(LINE_SEPARATOR);
 	        						if(++count % 5 == 0){
@@ -128,6 +135,21 @@ public class TaskProcessService extends Service<File>{
 	        						}
         						}
         					}
+        					
+        					if(!correctPidInCmd){
+        						cancel();
+        						Platform.runLater(new Runnable() {
+        							@Override
+     			    	            public void run() {
+        								String msg = Utils.getlocalizedString("ApptracerController.wrong.pid.txt");
+        		    	            	DialogFX dialog = new DialogFX();
+            			    	        dialog.setTitleText(Utils.getlocalizedString("Apptracer.title.txt"));
+            			    	        dialog.setMessage(msg);
+            			    	        dialog.showDialog();
+        							}
+        						});
+        					}
+        					
         				} catch (Exception e) {
         					throw new RuntimeException(e);
         				} finally{
@@ -141,10 +163,6 @@ public class TaskProcessService extends Service<File>{
         		return rtnVal;
             }
         };
-	}
-	
-	public void destroyTask(){
-		cancel();
 	}
 	
 	private String[] getCommand(){
