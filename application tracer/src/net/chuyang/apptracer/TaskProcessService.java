@@ -13,10 +13,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javafx.application.Platform;
@@ -29,10 +29,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.thehecklers.dialogfx.DialogFX;
-
-import com.sun.btrace.agent.Main;
-import com.sun.jna.Library;
-import com.sun.jna.Native;
 
 public class TaskProcessService extends Service<File>{
 	private ClassVO classVO;
@@ -84,6 +80,7 @@ public class TaskProcessService extends Service<File>{
         			    	        Platform.runLater(new Runnable() {
         			    	            @Override
         			    	            public void run() {
+        			    	            	killTaskProcess();
         			    	            	try {
 												FileUtils.writeStringToFile(rtnVal, APPTRACER_STOPPED + df.format(new Date()) + LINE_SEPARATOR, true);
 											} catch (IOException e) {
@@ -99,6 +96,26 @@ public class TaskProcessService extends Service<File>{
                 			    	        dialog.setMessage(msg);
                 			    	        dialog.showDialog();
         			    	            }
+
+										private void killTaskProcess() {
+											try {
+        			    	        			if(p != null){
+        			    	        				List<Integer> pids = new AssistenceService().getPidsToKill();
+        			    	        				if (com.sun.jna.Platform.isWindows()){
+        			    	        					for(Integer pid : pids){
+        			    	        						Runtime.getRuntime().exec("taskkill /pid " + pid + " /f");
+        			    	        					}
+        			    	        				}
+        			    	        				else if(com.sun.jna.Platform.isLinux()){
+        			    	        					for(Integer pid : pids){
+        			    	        						Runtime.getRuntime().exec("kill -9 " + pid);
+        			    	        					}
+        			    	        				}
+        			    	        			}
+        			    	        		} catch (IOException e) {
+        			    	        			logger.log(Level.WARN, "Failed to kill process.");
+        			    	        		}
+										}
         			    	       });
         			    			
         							break;
@@ -127,17 +144,6 @@ public class TaskProcessService extends Service<File>{
 	}
 	
 	public void destroyTask(){
-		try {
-			if(p != null){
-				if (com.sun.jna.Platform.isWindows())
-					Runtime.getRuntime().exec("taskkill /pid " + getPid(p) + " /f");
-				else if(com.sun.jna.Platform.isLinux())
-					Runtime.getRuntime().exec("kill -9 " + getPid(p));
-			}
-		} catch (IOException e) {
-			logger.log(Level.WARN, "Failed to kill process "+ getPid(p));
-		}
-		p.destroy();
 		cancel();
 	}
 	
@@ -161,7 +167,7 @@ public class TaskProcessService extends Service<File>{
 	
 	private String getReturnValueScript(ClassVO vo) {
 		String script = "";
-		String pathName = USER_DIR + FILE_SEPARATOR + "resource" + FILE_SEPARATOR + TEMPLATE_RETURN_VALUE_FILE;
+		String pathName = USER_DIR + FILE_SEPARATOR + "application tracer" + FILE_SEPARATOR + "resource" + FILE_SEPARATOR + TEMPLATE_RETURN_VALUE_FILE;
 		
 		try{
 			script = FileUtils.readFileToString(new File(pathName));
@@ -182,34 +188,4 @@ public class TaskProcessService extends Service<File>{
 		}
 		return rtnVal;
 	}	
-	
-	private interface Kernel32 extends Library {
-	    public static Kernel32 INSTANCE = (Kernel32) Native.loadLibrary("kernel32", Kernel32.class);
-	    public int GetProcessId(Long hProcess);
-	}
-	
-	private int getPid(Process p) {
-	    Field f;
-
-	    if (com.sun.jna.Platform.isWindows()) {
-	        try {
-	            f = p.getClass().getDeclaredField("handle");
-	            f.setAccessible(true);
-	            int pid = Kernel32.INSTANCE.GetProcessId((Long) f.get(p));
-	            return pid;
-	        } catch (Exception ex) {
-	            Logger.getLogger(Main.class.getName()).log(Level.ERROR, null, ex);
-	        }
-	    } else if (com.sun.jna.Platform.isLinux()) {
-	        try {
-	            f = p.getClass().getDeclaredField("pid");
-	            f.setAccessible(true);
-	            int pid = (Integer) f.get(p);
-	            return pid;
-	        } catch (Exception ex) {
-	            Logger.getLogger(Main.class.getName()).log(Level.ERROR, null, ex);
-	        }
-	    }
-	    return 0;
-	}
 }

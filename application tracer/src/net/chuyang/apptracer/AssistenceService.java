@@ -44,12 +44,9 @@ public class AssistenceService {
 		
 		boolean arriveAtData = false;
 		for(String netstatString : netstatStrings){
-			if(!arriveAtData){
-				if(netstatString.trim().startsWith("Proto"))
-					arriveAtData = true;
-				continue;
-			}else{
-				String[] fields = netstatString.trim().split("\\s{1,}");
+			netstatString = netstatString.trim();
+			if(netstatString.startsWith("TCP") || netstatString.startsWith("UDP")){
+				String[] fields = netstatString.split("\\s{1,}");
 				if(fields.length > 4){
 					if(fields[2].endsWith(":2020"))
 						rtnVal.add(Integer.valueOf(fields[4]));
