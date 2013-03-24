@@ -17,7 +17,7 @@ import com.sun.btrace.annotations.*;
 		method="${method}",
 		location=@Location(Kind.RETURN)
 	)
-	public static void traceExecute(@Self ${clazz} instance, @Return ${returnType} result){
-		println(strcat(strcat(strcat(strcat(str(timeMillis()), "  ____  "), str(result)), "  ____  "), str(timeMillis()-beginTime)));
+	public static void traceExecute(@Self ${clazz} instance, @ProbeMethodName String method, @Return ${returnType} result){
+		println(strcat(strcat(strcat(strcat(strcat(strcat(method, "  ____  "), str(timeMillis())), "  ____  "), str(result)), "  ____  "), str(timeMillis()-beginTime)));
 	}
 }

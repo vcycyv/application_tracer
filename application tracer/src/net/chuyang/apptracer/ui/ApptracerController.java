@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import org.thehecklers.dialogfx.DialogFX;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.WorkerStateEvent;
@@ -24,6 +26,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import net.chuyang.apptracer.AssistenceService;
 import net.chuyang.apptracer.AssistenceService.ProcessVO;
+import net.chuyang.apptracer.Constants;
 import net.chuyang.apptracer.TaskProcessService;
 import net.chuyang.apptracer.Utils;
 import net.chuyang.apptracer.codegen.ClassVO;
@@ -70,6 +73,9 @@ public class ApptracerController implements Initializable {
 	
 	@FXML
 	private void handleStartBtnAction(ActionEvent event){
+		if(validate() == false)
+			return;
+		
 		ProcessVO process = processListView.getSelectionModel().getSelectedItem();
 		ClassVO vo = new ClassVO();
 		vo.setClazz(classCombo.getSelectionModel().getSelectedItem().getClazz().getName());
@@ -241,5 +247,32 @@ public class ApptracerController implements Initializable {
 		targetJarTextfield.setDisable(false);
 		classPathListView.setDisable(false);
 		refreshBtn.setDisable(false);
+	}
+
+	private boolean validate(){
+		StringBuilder sb = new StringBuilder();
+		if(processListView.getSelectionModel().getSelectedItem() == null)
+			sb.append(Utils.getlocalizedString("ApptracerController.validation.process.txt")).append(Constants.LINE_SEPARATOR);
+		
+		if(classPathListView.getItems().size() < 1)
+			sb.append(Utils.getlocalizedString("ApptracerController.validation.classpath.txt")).append(Constants.LINE_SEPARATOR);
+		
+		if("".equals(targetJarTextfield.getText())){
+			sb.append(Utils.getlocalizedString("ApptracerController.validation.target.jar.txt")).append(Constants.LINE_SEPARATOR);
+		}else if(classCombo.getSelectionModel().getSelectedItem() == null){
+			sb.append(Utils.getlocalizedString("ApptracerController.validation.clazz.txt")).append(Constants.LINE_SEPARATOR);
+		}else if(methodCombo.getSelectionModel().getSelectedItem() == null){
+			sb.append(Utils.getlocalizedString("ApptracerController.validation.method.txt")).append(Constants.LINE_SEPARATOR);
+		}
+		
+		if("".equals(sb.toString())){
+			return true;
+		}else{
+			DialogFX dialog = new DialogFX();
+	        dialog.setTitleText(Utils.getlocalizedString("Apptracer.title.txt"));
+	        dialog.setMessage(sb.toString());
+	        dialog.showDialog();
+	        return false;
+		}
 	}
 }
