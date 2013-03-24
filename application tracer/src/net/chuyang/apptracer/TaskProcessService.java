@@ -185,7 +185,7 @@ public class TaskProcessService extends Service<File>{
 	
 	private String getReturnValueScript(ClassVO vo) {
 		String script = "";
-		String pathName = USER_DIR + FILE_SEPARATOR + "application tracer" + FILE_SEPARATOR + "resource" + FILE_SEPARATOR + TEMPLATE_RETURN_VALUE_FILE;
+		String pathName = USER_DIR + FILE_SEPARATOR + FILE_SEPARATOR + "resource" + FILE_SEPARATOR + TEMPLATE_RETURN_VALUE_FILE;
 		
 		try{
 			script = FileUtils.readFileToString(new File(pathName));
