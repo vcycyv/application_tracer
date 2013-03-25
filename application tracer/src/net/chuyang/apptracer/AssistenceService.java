@@ -1,6 +1,10 @@
 package net.chuyang.apptracer;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -107,6 +111,43 @@ public class AssistenceService {
 		}
 	}
 	
+	public void processLog(){
+		FileReader reader = null;
+		BufferedReader br = null;
+		try {
+			reader = new FileReader(Constants.OUTPUT_PATH);
+			br = new BufferedReader(reader);
+			String line = null;
+			StringBuilder sbPeriod = new StringBuilder();
+			StringBuilder sbData = new StringBuilder();
+			while ((line = br.readLine()) != null) {
+				if(line.startsWith("==")){
+					sbPeriod.append(line).append(Constants.LINE_SEPARATOR); 
+				}else if(!"".equals(line)){
+					sbData.append(line).append(Constants.LINE_SEPARATOR);
+				}
+			}
+			FileUtils.write(new File(Constants.OUTPUT_PERIOD_PATH), sbPeriod.toString());
+			FileUtils.write(new File(Constants.OUTPUT_DATA_PATH), sbData.toString());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}finally{
+			if(br != null)
+				try {
+					br.close();
+				} catch (IOException e) {
+					logger.warn("Failed to close buffered reader.", e);
+				}
+			if(reader != null){
+				try {
+					reader.close();
+				} catch (IOException e) {
+					logger.warn("Failed to cloase file reader.", e);
+				}
+			}
+		}
+	}
+	
 	public static class ProcessVO{
 		public int pid;
 		public String processName;
@@ -115,6 +156,8 @@ public class AssistenceService {
 	public static void main(String[] args){
 		//new AssistenceService().getJavaProcess();
 		//new AssistenceService().getClassesFromJar("C:/ws/_git/application_tracer/application tracer/target/test.jar");
-		new AssistenceService().getPidsToKill();
+		//new AssistenceService().getPidsToKill();
+		System.setProperty("user.dir", "C:/Users/scnchw/git/application_tracer/application tracer");
+		new AssistenceService().processLog();
 	}
 }
