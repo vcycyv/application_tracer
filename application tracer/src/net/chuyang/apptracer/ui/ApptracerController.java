@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import org.thehecklers.dialogfx.DialogFX;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.WorkerStateEvent;
@@ -27,9 +25,12 @@ import javafx.util.Callback;
 import net.chuyang.apptracer.AssistenceService;
 import net.chuyang.apptracer.AssistenceService.ProcessVO;
 import net.chuyang.apptracer.Constants;
+import net.chuyang.apptracer.DataProcessService;
 import net.chuyang.apptracer.TaskProcessService;
 import net.chuyang.apptracer.Utils;
 import net.chuyang.apptracer.codegen.ClassVO;
+
+import org.thehecklers.dialogfx.DialogFX;
 
 public class ApptracerController implements Initializable {
 
@@ -118,6 +119,22 @@ public class ApptracerController implements Initializable {
 		if(taskProcessService != null){
 			taskProcessService.cancel();
 		}
+	}
+	
+	@FXML
+	private void handleAnalyseBtnAction(ActionEvent event){
+		DataProcessService service = new DataProcessService();
+		service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+            	DialogFX dialog = new DialogFX();
+    	        dialog.setTitleText(Utils.getlocalizedString("Apptracer.title.txt"));
+    	        dialog.setMessage(t.getSource().getValue().toString());
+    	        dialog.showDialog();
+            }
+        });
+		
+		service.start();
 	}
 	
 	@FXML

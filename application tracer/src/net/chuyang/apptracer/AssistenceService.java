@@ -2,7 +2,6 @@ package net.chuyang.apptracer;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
@@ -46,7 +45,6 @@ public class AssistenceService {
 		String commandOutput = Utils.getOutputFromOSCommand("netstat -a -n -o");
 		String[] netstatStrings = commandOutput.split(Constants.LINE_SEPARATOR);
 		
-		boolean arriveAtData = false;
 		for(String netstatString : netstatStrings){
 			netstatString = netstatString.trim();
 			if(netstatString.startsWith("TCP") || netstatString.startsWith("UDP")){

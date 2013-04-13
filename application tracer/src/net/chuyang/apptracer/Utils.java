@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
 
 public class Utils {
 	/**
@@ -17,7 +18,7 @@ public class Utils {
 	public static String processCodeTemplate(String command, Map<String, String> paramMap){
 		for(Map.Entry<String, String> entry : paramMap.entrySet()){
 			String placeHolder = "\\$\\{" + entry.getKey() + "\\}";
-			command = command.replaceAll(placeHolder, entry.getValue());
+			command = command.replaceAll(placeHolder, Matcher.quoteReplacement(entry.getValue()));
 		}
 		return command;
 	}

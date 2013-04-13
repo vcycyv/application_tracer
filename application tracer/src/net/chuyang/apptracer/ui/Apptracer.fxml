@@ -12,8 +12,8 @@
     <ListView fx:id="classPathListView" layoutX="302.0" layoutY="68.0" prefHeight="174.0" prefWidth="415.0" />
     <Button id="addClassFolderButton" fx:id="addClassFolderBtn" layoutX="376.0" layoutY="261.0" mnemonicParsing="false" onAction="#handleAddClassFolderAction" text="%fxml.add.classfolder.txt" />
     <Button fx:id="addJarBtn" layoutX="529.0" layoutY="261.0" mnemonicParsing="false" onAction="#handleAddJarAction" text="%fxml.add.jar.txt" />
-    <Button fx:id="startBtn" layoutX="331.0" layoutY="536.0" mnemonicParsing="false" onAction="#handleStartBtnAction" text="%fxml.start.txt" />
-    <Button fx:id="stopBtn" layoutX="470.0" layoutY="536.0" mnemonicParsing="false" onAction="#handleStopBtnAction" text="%fxml.stop.txt" />
+    <Button fx:id="startBtn" layoutX="271.0" layoutY="542.0" mnemonicParsing="false" onAction="#handleStartBtnAction" text="%fxml.start.txt" />
+    <Button fx:id="stopBtn" layoutX="393.0" layoutY="542.0" mnemonicParsing="false" onAction="#handleStopBtnAction" text="%fxml.stop.txt" />
     <TextField fx:id="targetJarTextfield" editable="false" layoutX="229.0" layoutY="364.0" prefWidth="374.0" />
     <Label layoutX="141.0" layoutY="367.0" prefWidth="80.0" text="%fxml.select.target.txt" />
     <Button fx:id="addTargetJarBtn" layoutX="603.0" layoutY="365.0" mnemonicParsing="false" onAction="#handleSelectTargetJar" text="%fxml.select.txt" />
@@ -33,5 +33,6 @@
     <Button fx:id="refreshBtn" layoutX="131.0" layoutY="261.0" mnemonicParsing="false" onAction="#handleRefreshJpsAction" text="%fxml.refresh.txt" />
     <Label layoutX="82.0" layoutY="50.0" prefWidth="139.0" text="%fxml.select.process.txt" />
     <Label layoutX="302.0" layoutY="50.0" prefWidth="80.00009999999747" text="%fxml.classpath.txt" />
+    <Button layoutX="510.0" layoutY="542.0" mnemonicParsing="false" onAction="#handleAnalyseBtnAction" text="%fxml.analyse.txt" />
   </children>
 </AnchorPane>

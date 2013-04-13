@@ -1,0 +1,13 @@
+exeInfo <- do.call(rbind, strsplit(readLines('${logfile}'), '  ____  '));
+exeInfo <- data.frame(exeInfo);
+colnames(exeInfo) <- c('method', 'start time', 'result', 'cost');
+png(filename="${outputpath}cost.png");
+boxplot(as.numeric(levels(exeInfo$cost)), ylab="cost(ms)");
+dev.off();
+histData <- exeInfo[, 3];
+counts <- c(sum(histData == "true"), sum(histData == "false"));
+names <- c("true", "false");
+isBoolean <- all(levels(exeInfo[(1:5), 3])%in%c("true","false"));
+png(filename="${outputpath}booleanResult.png");
+if(isBoolean) barplot(counts, names.arg=names, ylab="counts");
+dev.off();
